@@ -1,5 +1,5 @@
 /**
- * \file EnvireMotorsPlugins.cpp
+ * \file EnvireSensorsPlugins.cpp
  * \author Malte Langosz
  *
  */
@@ -19,7 +19,6 @@
 
 #include <mars_interfaces/Logging.hpp>
 
-#include <mars_interfaces/MotorData.h>
 #include <mars_interfaces/sim/SimulatorInterface.h>
 #include <mars_interfaces/sim/SensorManagerInterface.h>
 
@@ -28,7 +27,7 @@ typedef envire::core::GraphTraits::vertex_descriptor VertexDesc;
 
 namespace mars
 {
-    namespace envire_motors
+    namespace envire_sensors
     {
 
         using std::string;
@@ -36,19 +35,21 @@ namespace mars
         using namespace interfaces;
         using namespace configmaps;
 
-        EnvireMotorsPlugins::EnvireMotorsPlugins(lib_manager::LibManager *theManager) :
+        EnvireSensorsPlugins::EnvireSensorsPlugins(lib_manager::LibManager *theManager) :
             lib_manager::LibInterface(theManager)
         {
             GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::CameraSensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
+
+            sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
         }
 
-        EnvireMotorsPlugins::~EnvireMotorsPlugins()
+        EnvireSensorsPlugins::~EnvireSensorsPlugins()
         {
         }
 
         // TODO: this should be moved out from here
-        std::shared_ptr<SubControlCenter> EnvireMotorsPlugins::getControlCenter(envire::core::FrameId frame)
+        std::shared_ptr<SubControlCenter> EnvireSensorsPlugins::getControlCenter(envire::core::FrameId frame)
         {
             // search for physics interface in graph
             bool done = false;
@@ -78,9 +79,9 @@ namespace mars
             return nullptr;
         }
 
-        void EnvireMotorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::CameraSensor>>& e)
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::CameraSensor>>& e)
         {
-            std::shared_ptr<interfaces::SubControlCenter> subControl = getControlCenter(frameId);
+            std::shared_ptr<interfaces::SubControlCenter> subControl = getControlCenter(e.frame);
             if (subControl == nullptr)
                 return;
 
@@ -89,7 +90,7 @@ namespace mars
 
             config["name"] = subControl->getPrefix() + config["name"].getString();
 
-            unsigned long drawID = control->graphics->getDrawID(e.frame);
+            unsigned long drawID = sim->getControlCenter()->graphics->getDrawID(e.frame);
             if(drawID)
             {
                 config["draw_id"] = drawID;
@@ -97,15 +98,15 @@ namespace mars
                 // TODO: temporarly add base sensor into the graph
                 // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
                 std::shared_ptr<interfaces::BaseSensor> baseSensor;
-                baseSensor.reset(control->sensors->createAndAddSensor(&config));
+                baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
                 envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
                 ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
             }
         }
 
-        void EnvireMotorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e)
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e)
         {
-            std::shared_ptr<interfaces::SubControlCenter> subControl = getControlCenter(frameId);
+            std::shared_ptr<interfaces::SubControlCenter> subControl = getControlCenter(e.frame);
             if (subControl == nullptr)
                 return;
 
@@ -132,7 +133,7 @@ namespace mars
             // TODO: temporarly add base sensor into the graph
             // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
             std::shared_ptr<interfaces::BaseSensor> baseSensor;
-            baseSensor.reset(control->sensors->createAndAddSensor(&config));
+            baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
             envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
             ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
         }
@@ -141,5 +142,5 @@ namespace mars
 
 } // end of namespace mars
 
-DESTROY_LIB(mars::envire_motors::EnvireMotorsPlugins);
-CREATE_LIB(mars::envire_motors::EnvireMotorsPlugins);
+DESTROY_LIB(mars::envire_sensors::EnvireSensorsPlugins);
+CREATE_LIB(mars::envire_sensors::EnvireSensorsPlugins);

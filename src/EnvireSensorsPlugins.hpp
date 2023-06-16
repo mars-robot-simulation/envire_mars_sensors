@@ -12,6 +12,8 @@
 #include <mars_interfaces/sim/ControlCenter.h>
 #include <mars/utils/Vector.h>
 
+#include <mars_interfaces/sim/SimulatorInterface.h>
+
 #include <lib_manager/LibInterface.hpp>
 
 #include <envire_core/items/Item.hpp>
@@ -48,7 +50,7 @@ namespace mars
 
             const std::string getLibName() const override
             {
-                return std::string("envire_mars_motors");
+                return std::string("envire_mars_sensors");
             }
 
             CREATE_MODULE_INFO();
@@ -57,6 +59,8 @@ namespace mars
             virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e) override;
 
         private:
+            interfaces::SimulatorInterface *sim;
+
             std::shared_ptr<interfaces::SubControlCenter> getControlCenter(envire::core::FrameId frame);
 
             void createSensor(configmaps::ConfigMap &config, const std::string &frameId);
