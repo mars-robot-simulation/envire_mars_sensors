@@ -95,13 +95,12 @@ namespace mars
             {
                 config["draw_id"] = drawID;
 
-                unsigned long sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
                 // TODO: temporarly add base sensor into the graph
                 // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-                //std::shared_ptr<interfaces::BaseSensor> baseSensor;
-                //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
-                //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
-                //ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
+                std::shared_ptr<interfaces::BaseSensor> baseSensor;
+                baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
+                envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
+                ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
             }
         }
 
@@ -131,13 +130,12 @@ namespace mars
             vectorToConfigItem(&(config["pos_offset"]), &(t.transform.translation));
             quaternionToConfigItem(&(config["ori_offset"]), &(t.transform.orientation));
 
-            unsigned long sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
             // TODO: temporarly add base sensor into the graph
             // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-            //std::shared_ptr<interfaces::BaseSensor> baseSensor;
-            //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
-            //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
-            //ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
+            std::shared_ptr<interfaces::BaseSensor> baseSensor;
+            baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
+            envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
+            ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
         }
 
     } // end of namespace envire_sensors
