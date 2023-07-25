@@ -88,8 +88,6 @@ namespace mars
             envire::base_types::sensors::CameraSensor& sensor = e.item->getData();
             ConfigMap config = sensor.getFullConfigMap();
 
-            config["name"] = subControl->getPrefix() + config["name"].getString();
-
             unsigned long drawID = sim->getControlCenter()->graphics->getDrawID(e.frame);
             if(drawID)
             {
@@ -112,8 +110,6 @@ namespace mars
 
             envire::base_types::sensors::RaySensor& sensor = e.item->getData();
             ConfigMap config = sensor.getFullConfigMap();
-
-            config["name"] = subControl->getPrefix() + config["name"].getString();
 
             // get parent smurf frame
             const envire::core::GraphTraits::vertex_descriptor vertex = ControlCenter::envireGraph->vertex(e.frame);
