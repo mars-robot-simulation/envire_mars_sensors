@@ -96,10 +96,10 @@ namespace mars
                 unsigned long sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
                 // TODO: temporarly add base sensor into the graph
                 // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-                //std::shared_ptr<interfaces::BaseSensor> baseSensor;
-                //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
-                //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
-                //ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
+                std::shared_ptr<interfaces::BaseSensor> baseSensor;
+                baseSensor.reset(sim->getControlCenter()->sensors->getSimSensor(sensorID));
+                envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
+                ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
             }
         }
 
