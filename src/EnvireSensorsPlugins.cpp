@@ -13,7 +13,6 @@
 #include <mars_interfaces/graphics/GraphicsManagerInterface.h>
 #include <mars_interfaces/sim/LoadCenter.h>
 #include <mars_interfaces/sim/LoadSceneInterface.h>
-#include <mars_interfaces/sim/JointInterface.h>
 #include <lib_manager/LibInterface.hpp>
 #include <lib_manager/LibManager.hpp>
 
