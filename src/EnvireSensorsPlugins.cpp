@@ -17,11 +17,11 @@
 #include <lib_manager/LibManager.hpp>
 
 #include <mars_interfaces/Logging.hpp>
+#include <mars_interfaces/MARSDefs.h>
 
 #include <mars_interfaces/sim/SimulatorInterface.h>
 #include <mars_interfaces/sim/SensorManagerInterface.h>
 
-#define SIM_CENTER_FRAME_NAME "world"
 typedef envire::core::GraphTraits::vertex_descriptor VertexDesc;
 
 namespace mars
