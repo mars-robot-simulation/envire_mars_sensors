@@ -45,6 +45,12 @@ namespace mars
 
         EnvireSensorsPlugins::~EnvireSensorsPlugins()
         {
+            if (sim)
+            {
+                // TODO: This would release the last reference to mars_core. This somehow results in a segmentation fault in mars_ode_physics::Joint::~Joint when calling dJointDestroy.
+                // libManager->releaseLibrary("mars_core");
+                // sim = nullptr;
+            }
         }
 
         // TODO: this should be moved out from here
