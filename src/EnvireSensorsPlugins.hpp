@@ -1,20 +1,16 @@
 /**
- * \file EnvireOdePhysicsPlugins.hpp
+ * \file EnvireSensorsPlugins.hpp
  * \author Malte Langosz
- * \brief Plugin class to load physics representation based on envire items
+ * \brief Plugin class to load sensor representations based on envire items
  *
  */
 
 #pragma once
 
-// TODO: check and clean the header includes
-
-#include <mars_interfaces/sim/ControlCenter.h>
-#include <mars_utils/Vector.h>
-
-#include <mars_interfaces/sim/SimulatorInterface.h>
 
 #include <lib_manager/LibInterface.hpp>
+
+#include <mars_interfaces/sim/SimulatorInterface.h>
 
 #include <envire_core/items/Item.hpp>
 #include <envire_core/graph/EnvireGraph.hpp>
@@ -25,7 +21,8 @@
 #include <envire_base_types/sensors/CameraSensor.hpp>
 #include <envire_base_types/sensors/RaySensor.hpp>
 
-#include <iostream>
+#include <mars_interfaces/sim/ControlCenter.h>
+#include <mars_utils/Vector.h>
 
 namespace mars
 {
@@ -50,7 +47,7 @@ namespace mars
 
             const std::string getLibName() const override
             {
-                return std::string("envire_mars_sensors");
+                return std::string{"envire_mars_sensors"};
             }
 
             CREATE_MODULE_INFO();
@@ -61,6 +58,7 @@ namespace mars
         private:
             interfaces::SimulatorInterface *sim;
 
+            // TODO: Move to central location
             std::shared_ptr<interfaces::SubControlCenter> getControlCenter(envire::core::FrameId frame);
 
             void createSensor(configmaps::ConfigMap &config, const std::string &frameId);
