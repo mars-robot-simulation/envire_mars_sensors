@@ -64,7 +64,7 @@ namespace mars
                     try
                     {
                         using SubControlItem = envire::core::Item<std::shared_ptr<SubControlCenter>>;
-                        envire::core::EnvireGraph::ItemIterator<SubControlItem> it = ControlCenter::envireGraph->getItem<SubControlItem>(frame);
+                        const auto& it = ControlCenter::envireGraph->getItem<SubControlItem>(frame);
                         return it->getData();
                     }
                     catch (...)
@@ -81,25 +81,24 @@ namespace mars
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::CameraSensor>>& e)
         {
-            std::shared_ptr<interfaces::SubControlCenter> subControl{getControlCenter(e.frame)};
+            auto subControl = getControlCenter(e.frame);
             if (!subControl)
             {
                 return;
             }
 
-            envire::base_types::sensors::CameraSensor& sensor = e.item->getData();
-            ConfigMap config{sensor.getFullConfigMap()};
+            auto& sensor = e.item->getData();
+            auto config = sensor.getFullConfigMap();
 
-            const unsigned long drawID = sim->getControlCenter()->graphics->getDrawID(e.frame);
+            const auto drawID = sim->getControlCenter()->graphics->getDrawID(e.frame);
             if(drawID)
             {
                 config["draw_id"] = drawID;
 
-                const unsigned long sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+                const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
                 // TODO: temporarly add base sensor into the graph
                 // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-                std::shared_ptr<interfaces::BaseSensor> baseSensor;
-                baseSensor.reset(sim->getControlCenter()->sensors->getSimSensor(sensorID));
+                std::shared_ptr<interfaces::BaseSensor> baseSensor{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
                 envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr{new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor)};
                 ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
             }
@@ -107,31 +106,31 @@ namespace mars
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e)
         {
-            std::shared_ptr<interfaces::SubControlCenter> subControl{getControlCenter(e.frame)};
+            auto subControl = getControlCenter(e.frame);
             if (!subControl)
             {
                 return;
             }
 
-            envire::base_types::sensors::RaySensor& sensor = e.item->getData();
-            ConfigMap config{sensor.getFullConfigMap()};
+            auto& sensor = e.item->getData();
+            auto config = sensor.getFullConfigMap();
 
             // get parent smurf frame
-            const envire::core::GraphTraits::vertex_descriptor vertex{ControlCenter::envireGraph->vertex(e.frame)};
-            const envire::core::GraphTraits::vertex_descriptor& parentVertex = ControlCenter::graphTreeView->tree[vertex].parent;
-            const envire::core::FrameId parentFrame{ControlCenter::envireGraph->getFrameId(parentVertex)};
+            const auto& vertex = ControlCenter::envireGraph->vertex(e.frame);
+            const auto& parentVertex = ControlCenter::graphTreeView->tree[vertex].parent;
+            const auto& parentFrame = ControlCenter::envireGraph->getFrameId(parentVertex);
 
             bool found = false;
             config["groupName"] = "mars_sim";
             config["dataName"] = "Frames/"+parentFrame;
-            envire::core::Transform t{ControlCenter::envireGraph->getTransform(SIM_CENTER_FRAME_NAME, parentFrame)};
-            vectorToConfigItem((&config["init_position"]), &(t.transform.translation));
-            quaternionToConfigItem(&(config["init_orientation"]), &(t.transform.orientation));
-            t = ControlCenter::envireGraph->getTransform(parentFrame, e.frame);
-            vectorToConfigItem(&(config["pos_offset"]), &(t.transform.translation));
-            quaternionToConfigItem(&(config["ori_offset"]), &(t.transform.orientation));
+            const auto& tCenterToParent = ControlCenter::envireGraph->getTransform(SIM_CENTER_FRAME_NAME, parentFrame);
+            vectorToConfigItem((&config["init_position"]), &(tCenterToParent.transform.translation));
+            quaternionToConfigItem(&(config["init_orientation"]), &(tCenterToParent.transform.orientation));
+            const auto& tParentToItem = ControlCenter::envireGraph->getTransform(parentFrame, e.frame);
+            vectorToConfigItem(&(config["pos_offset"]), &(tParentToItem.transform.translation));
+            quaternionToConfigItem(&(config["ori_offset"]), &(tParentToItem.transform.orientation));
 
-            const unsigned long sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+            const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
             // TODO: temporarly add base sensor into the graph
             // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
             //std::shared_ptr<interfaces::BaseSensor> baseSensor;
