@@ -98,9 +98,9 @@ namespace mars
                 const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
                 // TODO: temporarly add base sensor into the graph
                 // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-                std::shared_ptr<interfaces::BaseSensor> baseSensor{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
-                envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr baseSensorItemPtr{new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor)};
-                ControlCenter::envireGraph->addItemToFrame(e.frame, baseSensorItemPtr);
+                auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
+                auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
+                ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
             }
         }
 
@@ -120,15 +120,14 @@ namespace mars
             const auto& parentVertex = ControlCenter::graphTreeView->tree[vertex].parent;
             const auto& parentFrame = ControlCenter::envireGraph->getFrameId(parentVertex);
 
-            bool found = false;
             config["groupName"] = "mars_sim";
-            config["dataName"] = "Frames/"+parentFrame;
+            config["dataName"] = "Frames/" + parentFrame;
             const auto& tCenterToParent = ControlCenter::envireGraph->getTransform(SIM_CENTER_FRAME_NAME, parentFrame);
-            vectorToConfigItem((&config["init_position"]), &(tCenterToParent.transform.translation));
-            quaternionToConfigItem(&(config["init_orientation"]), &(tCenterToParent.transform.orientation));
+            config["init_position"] = vectorToConfigItem(tCenterToParent.transform.translation);
+            config["init_orientation"] = quaternionToConfigItem(tCenterToParent.transform.orientation);
             const auto& tParentToItem = ControlCenter::envireGraph->getTransform(parentFrame, e.frame);
-            vectorToConfigItem(&(config["pos_offset"]), &(tParentToItem.transform.translation));
-            quaternionToConfigItem(&(config["ori_offset"]), &(tParentToItem.transform.orientation));
+            config["pos_offset"] = vectorToConfigItem(tParentToItem.transform.translation);
+            config["ori_offset"] = quaternionToConfigItem(tParentToItem.transform.orientation);
 
             const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
             // TODO: temporarly add base sensor into the graph
