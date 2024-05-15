@@ -18,8 +18,8 @@
 #include <envire_core/events/GraphEventDispatcher.hpp>
 #include <envire_core/events/GraphItemEventDispatcher.hpp>
 
-#include <envire_base_types/sensors/CameraSensor.hpp>
-#include <envire_base_types/sensors/RaySensor.hpp>
+#include <envire_types/sensors/CameraSensor.hpp>
+#include <envire_types/sensors/RaySensor.hpp>
 
 #include <mars_interfaces/sim/ControlCenter.h>
 #include <mars_utils/Vector.h>
@@ -31,8 +31,8 @@ namespace mars
         // move the typedef to separate file
         class EnvireSensorsPlugins : public lib_manager::LibInterface,
                                     public envire::core::GraphEventDispatcher,
-                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::CameraSensor>>,
-                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::RaySensor>>
+                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>,
+                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>
         {
 
         public:
@@ -52,8 +52,8 @@ namespace mars
 
             CREATE_MODULE_INFO();
 
-            virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::CameraSensor>>& e) override;
-            virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e) override;
+            virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::CameraSensor>>& e) override;
+            virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RaySensor>>& e) override;
 
         private:
             interfaces::SimulatorInterface *sim;

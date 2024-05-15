@@ -32,8 +32,8 @@ namespace mars
         EnvireSensorsPlugins::EnvireSensorsPlugins(lib_manager::LibManager *theManager) :
             lib_manager::LibInterface{theManager}
         {
-            GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::CameraSensor>>::subscribe(ControlCenter::envireGraph.get());
-            GraphItemEventDispatcher<envire::core::Item<::envire::base_types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>::subscribe(ControlCenter::envireGraph.get());
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
 
             sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
         }
@@ -79,7 +79,7 @@ namespace mars
             return nullptr;
         }
 
-        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::CameraSensor>>& e)
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::CameraSensor>>& e)
         {
             auto subControl = getControlCenter(e.frame);
             if (!subControl)
@@ -104,7 +104,7 @@ namespace mars
             }
         }
 
-        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::base_types::sensors::RaySensor>>& e)
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RaySensor>>& e)
         {
             auto subControl = getControlCenter(e.frame);
             if (!subControl)
