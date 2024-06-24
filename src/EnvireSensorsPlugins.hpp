@@ -20,6 +20,7 @@
 
 #include <envire_types/sensors/CameraSensor.hpp>
 #include <envire_types/sensors/RaySensor.hpp>
+#include <envire_types/sensors/Joint6DOFSensor.hpp>
 
 #include <mars_interfaces/sim/ControlCenter.h>
 #include <mars_utils/Vector.h>
@@ -32,7 +33,8 @@ namespace mars
         class EnvireSensorsPlugins : public lib_manager::LibInterface,
                                     public envire::core::GraphEventDispatcher,
                                     public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>,
-                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>
+                                     public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>,
+                                    public envire::core::GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>
         {
 
         public:
@@ -54,6 +56,7 @@ namespace mars
 
             virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::CameraSensor>>& e) override;
             virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RaySensor>>& e) override;
+            virtual void itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>& e) override;
 
         private:
             interfaces::SimulatorInterface *sim;

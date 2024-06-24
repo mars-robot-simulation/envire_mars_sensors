@@ -34,6 +34,7 @@ namespace mars
         {
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>::subscribe(ControlCenter::envireGraph.get());
 
             sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
         }
@@ -136,6 +137,30 @@ namespace mars
             //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
             //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
             //ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
+        }
+
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>& e)
+        {
+            auto subControl = getControlCenter(e.frame);
+            if (!subControl)
+            {
+                return;
+            }
+
+            auto& sensor = e.item->getData();
+            auto config = sensor.getFullConfigMap();
+
+            // get parent smurf frame
+            const auto& vertex = ControlCenter::envireGraph->vertex(e.frame);
+            const auto& parentVertex = ControlCenter::graphTreeView->tree[vertex].parent;
+            const auto& parentFrame = ControlCenter::envireGraph->getFrameId(parentVertex);
+
+            config["nodeGroupName"] = "mars_sim";
+            config["nodeDataName"] = "Frames/" + parentFrame;
+            config["jointGroupName"] = "mars_sim";
+            config["jointDataName"] = "Joints/" + config["joint"].getString();
+            
+            const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
         }
     } // end of namespace envire_sensors
 } // end of namespace mars
