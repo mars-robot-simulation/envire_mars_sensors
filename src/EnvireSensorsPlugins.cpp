@@ -159,8 +159,11 @@ namespace mars
             config["nodeDataName"] = "Frames/" + parentFrame;
             config["jointGroupName"] = "mars_sim";
             config["jointDataName"] = "Joints/" + config["joint"].getString();
-            
+
             const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+            auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
+            auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
+            ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
         }
     } // end of namespace envire_sensors
 } // end of namespace mars
