@@ -34,6 +34,7 @@ namespace mars
         {
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RotatingRaySensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>::subscribe(ControlCenter::envireGraph.get());
 
             sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
@@ -131,12 +132,50 @@ namespace mars
             config["ori_offset"] = quaternionToConfigItem(tParentToItem.transform.orientation);
 
             const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+            
+            std::cout << "RaySensor ID " << sensorID << std::endl;
             // TODO: temporarly add base sensor into the graph
             // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
             //std::shared_ptr<interfaces::BaseSensor> baseSensor;
             //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
             //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
             //ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
+        }
+
+        void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RotatingRaySensor>>& e)
+        {
+            auto subControl = getControlCenter(e.frame);
+            if (!subControl)
+            {
+                return;
+            }
+
+            auto& sensor = e.item->getData();
+            auto config = sensor.getFullConfigMap();
+
+            //for (auto value : config){
+            //    std::cout << value.first << " : " << value.second.c_str() << std::endl;
+            //}
+
+
+            // get parent smurf frame
+            const auto& vertex = ControlCenter::envireGraph->vertex(e.frame);
+            const auto& parentVertex = ControlCenter::graphTreeView->tree[vertex].parent;
+            const auto& parentFrame = ControlCenter::envireGraph->getFrameId(parentVertex);
+
+            config["groupName"] = "mars_sim";
+            config["dataName"] = "Frames/" + parentFrame;
+            const auto& tCenterToParent = ControlCenter::envireGraph->getTransform(SIM_CENTER_FRAME_NAME, parentFrame);
+            config["init_position"] = vectorToConfigItem(tCenterToParent.transform.translation);
+            config["init_orientation"] = quaternionToConfigItem(tCenterToParent.transform.orientation);
+            const auto& tParentToItem = ControlCenter::envireGraph->getTransform(parentFrame, e.frame);
+            config["pos_offset"] = vectorToConfigItem(tParentToItem.transform.translation);
+            config["ori_offset"] = quaternionToConfigItem(tParentToItem.transform.orientation);
+
+            const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+
+            std::cout << "RotatingRaySensor ID " << sensorID << std::endl;
+
         }
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>& e)
