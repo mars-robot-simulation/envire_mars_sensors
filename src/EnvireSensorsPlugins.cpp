@@ -132,14 +132,12 @@ namespace mars
             config["ori_offset"] = quaternionToConfigItem(tParentToItem.transform.orientation);
 
             const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
-            
-            std::cout << "RaySensor ID " << sensorID << std::endl;
+
             // TODO: temporarly add base sensor into the graph
             // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-            //std::shared_ptr<interfaces::BaseSensor> baseSensor;
-            //baseSensor.reset(sim->getControlCenter()->sensors->createAndAddSensor(&config));
-            //envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr sensorItemPtr(new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor));
-            //ControlCenter::envireGraph->addItemToFrame(e.frame, sensorItemPtr);
+            auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
+            auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
+            ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
         }
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RotatingRaySensor>>& e)
@@ -173,9 +171,9 @@ namespace mars
             config["ori_offset"] = quaternionToConfigItem(tParentToItem.transform.orientation);
 
             const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
-
-            std::cout << "RotatingRaySensor ID " << sensorID << std::endl;
-
+            auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
+            auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
+            ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
         }
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>& e)
