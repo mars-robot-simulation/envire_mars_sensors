@@ -193,7 +193,7 @@ namespace mars
             const auto& parentFrame = ControlCenter::envireGraph->getFrameId(parentVertex);
 
             config["nodeGroupName"] = "mars_sim";
-            config["nodeDataName"] = "Frames/" + parentFrame;
+            config["nodeDataName"] = "Frames/" + e.frame;
             config["jointGroupName"] = "mars_sim";
             config["jointDataName"] = "Joints/" + config["joint"].getString();
 
