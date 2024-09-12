@@ -92,7 +92,7 @@ namespace mars
             auto& sensor = e.item->getData();
             auto config = sensor.getFullConfigMap();
 
-            const auto drawID = sim->getControlCenter()->graphics->getDrawID(e.frame);
+            const auto drawID = sim->getControlCenter()->graphics->getDrawID(e.frame + "_frame");
             if(drawID)
             {
                 config["draw_id"] = drawID;
