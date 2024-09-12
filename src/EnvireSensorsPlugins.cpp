@@ -15,7 +15,6 @@
 #include <mars_interfaces/sim/LoadCenter.h>
 #include <mars_interfaces/sim/LoadSceneInterface.h>
 
-#include <mars_interfaces/Logging.hpp>
 #include <mars_interfaces/MARSDefs.h>
 
 #include <mars_interfaces/sim/SimulatorInterface.h>
@@ -93,17 +92,22 @@ namespace mars
             auto config = sensor.getFullConfigMap();
 
             const auto drawID = sim->getControlCenter()->graphics->getDrawID(e.frame + "_frame");
-            if(drawID)
+            if(!drawID)
             {
-                config["draw_id"] = drawID;
-
-                const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
-                // TODO: temporarly add base sensor into the graph
-                // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
-                auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
-                auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
-                ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
+                const auto msg = std::string{"Got no valid draw id from mars_graphics for camera in frame \""} + e.frame + "\"";
+                // TODO: Use warning instead.
+                // LOG_WARN(msg.c_str());
+                std::cout << msg << std::endl;
+                return;
             }
+            config["draw_id"] = drawID;
+
+            const auto sensorID = sim->getControlCenter()->sensors->createAndAddSensor(&config);
+            // TODO: temporarly add base sensor into the graph
+            // we can replace it with the similar structure as DynamicObjectItem: BaseSensorItem
+            auto baseSensor = std::shared_ptr<interfaces::BaseSensor>{sim->getControlCenter()->sensors->getSimSensor(sensorID)};
+            auto baseSensorEnvireItemPtr = new envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>(baseSensor);
+            ControlCenter::envireGraph->addItemToFrame(e.frame, envire::core::Item<std::shared_ptr<interfaces::BaseSensor>>::Ptr{baseSensorEnvireItemPtr});
         }
 
         void EnvireSensorsPlugins::itemAdded(const envire::core::TypedItemAddedEvent<envire::core::Item<::envire::types::sensors::RaySensor>>& e)
