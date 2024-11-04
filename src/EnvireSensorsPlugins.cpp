@@ -35,17 +35,28 @@ namespace mars
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RotatingRaySensor>>::subscribe(ControlCenter::envireGraph.get());
             GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>::subscribe(ControlCenter::envireGraph.get());
-
-            sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
+            if(libManager)
+            {
+                sim = libManager->getLibraryAs<SimulatorInterface>("mars_core");
+            }
+            else
+            {
+                sim = nullptr;
+            }
         }
 
         EnvireSensorsPlugins::~EnvireSensorsPlugins()
         {
-            if (sim)
+            // unsubscribe from envire graph
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::CameraSensor>>::unsubscribe();
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RaySensor>>::unsubscribe();
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::RotatingRaySensor>>::unsubscribe();
+            GraphItemEventDispatcher<envire::core::Item<::envire::types::sensors::Joint6DOFSensor>>::unsubscribe();
+            if(sim)
             {
                 // TODO: This would release the last reference to mars_core. This somehow results in a segmentation fault in mars_ode_physics::Joint::~Joint when calling dJointDestroy.
-                // libManager->releaseLibrary("mars_core");
-                // sim = nullptr;
+                libManager->releaseLibrary("mars_core");
+                sim = nullptr;
             }
         }
 
