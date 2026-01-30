@@ -73,8 +73,11 @@ set(_INSTALL_DESTINATIONS
         ARCHIVE DESTINATION lib
 )
 
+find_package(glog REQUIRED)
+
 TARGET_LINK_LIBRARIES(${PROJECT_NAME}
             ${PKGCONFIG_LIBRARIES}
+            glog::glog
             ${WIN_LIBS}
 )
 
